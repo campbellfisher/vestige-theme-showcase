@@ -1,0 +1,58 @@
+{% comment %}
+  Product card. Accepts: product (required), show_vendor, show_quick_add
+{% endcomment %}
+{%- liquid
+  assign show_vendor = show_vendor | default: true
+  assign show_quick_add = show_quick_add | default: true
+-%}
+<div class="product-card">
+  <div class="product-card__media">
+    <a href="{{ product.url }}" aria-label="{{ product.title | escape }}" tabindex="-1">
+      {%- if product.featured_media -%}
+        {%- liquid
+          assign main_alt = product.featured_media.alt | default: product.title | escape
+          assign main_style = ''
+          if product.featured_media.presentation.focal_point != blank
+            assign main_style = 'object-position: ' | append: product.featured_media.presentation.focal_point
+          endif
+        -%}
+        {{ product.featured_media | image_url: width: 800 | image_tag:
+          loading: 'lazy',
+          widths: '400, 600, 800',
+          class: 'img--main',
+          alt: main_alt,
+          style: main_style
+        }}
+        {%- if product.media[1] -%}
+          {{ product.media[1] | image_url: width: 800 | image_tag:
+            loading: 'lazy',
+            widths: '400, 600, 800',
+            class: 'img--hover',
+            alt: product.media[1].alt | default: product.title | escape
+          }}
+        {%- endif -%}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'img--main' }}
+      {%- endif -%}
+    </a>
+    <div class="product-card__badges">
+      {%- render 'product-badges', product: product -%}
+    </div>
+    {%- if show_quick_add and product.available and product.variants.size == 1 -%}
+      <div class="product-card__quickadd">
+        <button type="button" class="btn btn--secondary" data-quick-add="{{ product.selected_or_first_available_variant.id }}">
+          {{ 'products.product.quick_add' | t }}
+        </button>
+      </div>
+    {%- endif -%}
+  </div>
+  <div class="product-card__info">
+    {%- if show_vendor and product.vendor != blank -%}
+      <p class="product-card__vendor">{{ product.vendor }}</p>
+    {%- endif -%}
+    <h3 class="product-card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    {% render 'price', product: product %}
+  </div>
+</div>

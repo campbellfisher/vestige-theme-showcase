@@ -1,0 +1,126 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="{{ settings.color_background }}">
+
+  <title>
+    {{ page_title }}
+    {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+    {%- if current_page != 1 %} &ndash; {{ 'general.pagination.page' | t: number: current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+
+  {% if page_description %}
+    <meta name="description" content="{{ page_description | escape }}">
+  {% endif %}
+
+  {% render 'meta-tags' %}
+
+  <link rel="canonical" href="{{ canonical_url }}">
+
+  {{ content_for_header }}
+
+  {%- liquid
+    assign header_font = settings.type_header_font
+    assign body_font = settings.type_body_font
+    assign header_font_bold = header_font | font_modify: 'weight', '700'
+    assign header_font_italic = header_font | font_modify: 'style', 'italic'
+    assign body_font_bold = body_font | font_modify: 'weight', '700'
+  -%}
+
+  <style>
+    {{ header_font | font_face }}
+    {{ header_font_bold | font_face }}
+    {{ header_font_italic | font_face }}
+    {{ body_font | font_face }}
+    {{ body_font_bold | font_face }}
+  </style>
+
+  <style>
+    :root {
+      --color-background: {{ settings.color_background }};
+      --color-text: {{ settings.color_text }};
+      --color-muted: {{ settings.color_muted_text }};
+      --color-accent: {{ settings.color_accent }};
+      --color-border: {{ settings.color_border }};
+      --color-card: {{ settings.color_card_background }};
+      --color-card-text: {{ settings.color_card_text | default: settings.color_text }};
+      --color-button-bg: {{ settings.color_button_background }};
+      --color-button-text: {{ settings.color_button_text }};
+      --color-sale: {{ settings.color_sale }};
+      --color-header-bg: {{ settings.color_header_background }};
+      --color-header-text: {{ settings.color_header_text | default: settings.color_text }};
+      --color-footer-bg: {{ settings.color_footer_background }};
+      --color-footer-text: {{ settings.color_footer_text }};
+      --font-heading: {{ header_font.family }}, {{ header_font.fallback_families }};
+      --font-body: {{ body_font.family }}, {{ body_font.fallback_families }};
+      --font-base-size: {{ settings.type_base_size | default: 16 }}px;
+      --header-height: 76px;
+      --page-width: 1440px;
+      --gutter: clamp(1.25rem, 4vw, 4rem);
+      --radius: 2px;
+    }
+  </style>
+
+  {{ 'theme.css' | asset_url | stylesheet_tag: preload: true }}
+
+  {%- if settings.favicon != blank -%}
+    <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+  {%- endif -%}
+
+  <script>document.documentElement.className = document.documentElement.className.replace('no-js', 'js');</script>
+</head>
+
+<body class="template-{{ template.name | handle }}{% if template.suffix %} template-{{ template.name | handle }}-{{ template.suffix | handle }}{% endif %}">
+  <a class="skip-link" href="#MainContent">{{ 'accessibility.skip_to_content' | t }}</a>
+
+  {% sections 'header-group' %}
+
+  <main id="MainContent" class="main-content" role="main" tabindex="-1">
+    {{ content_for_layout }}
+  </main>
+
+  {% sections 'footer-group' %}
+
+  <script>
+    window.themeRoutes = {
+      cartAddUrl: '{{ routes.cart_add_url }}',
+      cartChangeUrl: '{{ routes.cart_change_url }}',
+      cartUpdateUrl: '{{ routes.cart_update_url }}',
+      cartUrl: '{{ routes.cart_url }}',
+      predictiveSearchUrl: '{{ routes.predictive_search_url }}',
+      rootUrl: '{{ routes.root_url }}'
+    };
+    window.themeMoneyFormat = {{ shop.money_format | json }};
+    window.themeSettings = {
+      cartType: {{ settings.cart_type | json }},
+      predictiveSearchEnabled: {{ settings.predictive_search_enabled | json }},
+      freeShippingThreshold: {{ settings.free_shipping_threshold | json }}
+    };
+    window.themeStrings = {
+      addToCart: {{ 'products.product.add_to_cart' | t | json }},
+      soldOut: {{ 'products.product.sold_out' | t | json }},
+      unavailable: {{ 'products.product.unavailable' | t | json }},
+      quantityLabel: {{ 'products.product.quantity.label' | t | json }},
+      removeItem: {{ 'cart.general.remove' | t | json }},
+      cartEmpty: {{ 'cart.general.empty' | t | json }},
+      cartSubtotal: {{ 'cart.general.subtotal' | t | json }},
+      cartCheckout: {{ 'cart.general.checkout' | t | json }},
+      cartViewCart: {{ 'cart.general.view_cart' | t | json }},
+      cartContinueShopping: {{ 'cart.general.continue_shopping' | t | json }},
+      cartItemAdded: {{ 'cart.general.item_added' | t | json }},
+      cartDiscount: {{ 'cart.general.discount' | t | json }},
+      freeShippingRemaining: {{ 'cart.general.free_shipping_remaining' | t | json }},
+      freeShippingUnlocked: {{ 'cart.general.free_shipping_unlocked' | t | json }},
+      searchResults: {{ 'search.results' | t | json }},
+      searchViewAll: {{ 'search.view_all' | t | json }},
+      searchNoResults: {{ 'search.no_results' | t | json }},
+      loading: {{ 'general.loading' | t | json }}
+    };
+  </script>
+  <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+</body>
+</html>

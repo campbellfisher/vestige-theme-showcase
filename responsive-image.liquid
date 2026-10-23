@@ -1,0 +1,22 @@
+{% comment %}
+  responsive-image
+  Accepts:
+    - image (required): image object
+    - widths (default "375, 550, 750, 1100, 1500")
+    - sizes (default "100vw")
+    - class (default "")
+    - alt (default image.alt)
+{% endcomment %}
+{%- liquid
+  assign widths = widths | default: '375, 550, 750, 1100, 1500'
+  assign sizes = sizes | default: '100vw'
+  assign img_class = class | default: ''
+  assign img_alt = alt | default: image.alt | default: ''
+  assign img_style = ''
+  if image.presentation.focal_point != blank
+    assign img_style = 'object-position: ' | append: image.presentation.focal_point
+  endif
+-%}
+{%- if image -%}
+  {{ image | image_url: width: 1500 | image_tag: widths: widths, sizes: sizes, class: img_class, alt: img_alt, loading: 'lazy', style: img_style }}
+{%- endif -%}

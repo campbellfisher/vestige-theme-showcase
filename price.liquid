@@ -1,0 +1,26 @@
+{% comment %}
+  Product price. Accepts: product (required), use_variant (optional bool), show_badges (optional)
+{% endcomment %}
+{%- liquid
+  assign target = product.selected_or_first_available_variant
+  if use_variant and product.selected_variant
+    assign target = product.selected_variant
+  endif
+  assign compare_price = target.compare_at_price
+  assign price = target.price | default: 1999
+-%}
+<div class="product-card__price">
+  {%- if compare_price > price -%}
+    <span class="visually-hidden">{{ 'products.product.regular_price' | t }}</span>
+    <span class="price price--compare">{{ compare_price | money }}</span>
+    <span class="visually-hidden">{{ 'products.product.sale_price' | t }}</span>
+    <span class="price price--sale">{{ price | money }}</span>
+  {%- else -%}
+    <span class="price">{{ price | money }}</span>
+  {%- endif -%}
+  {%- if target.unit_price_measurement -%}
+    <span class="price--unit">
+      {{ target.unit_price | money }}/{{ target.unit_price_measurement.reference_unit }}
+    </span>
+  {%- endif -%}
+</div>
